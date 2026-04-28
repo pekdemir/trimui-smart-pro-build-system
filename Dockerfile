@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:25.10
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -12,7 +12,10 @@ RUN apt update && apt install -y \
     tar \
     libssl-dev \
     file \
-    curl
+    curl \
+    cmake \
+    git \
+    meson
 
 WORKDIR /sdk
 
@@ -27,6 +30,12 @@ RUN wget -q https://github.com/trimui/toolchain_sdk_smartpro/releases/download/2
 RUN wget -q https://github.com/trimui/toolchain_sdk_smartpro/releases/download/20231018/SDL2-2.26.1.GE8300.tgz && \
     tar -xzf SDL2-2.26.1.GE8300.tgz -C /sdk && \
     rm SDL2-2.26.1.GE8300.tgz
+
+RUN cd /sdk/usr && \
+    git clone --depth=1 https://github.com/pekdemir/raylib.git && \
+    cd raylib/src && \
+    make PLATFORM=PLATFORM_TRIMUI -j && \
+    cp libraylib.a /sdk/usr/lib && cp raylib.h /sdk/usr/include    
 
 ENV PATH="/sdk/aarch64-linux-gnu-7.5.0-linaro/bin:$PATH"
 

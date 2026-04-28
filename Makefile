@@ -9,13 +9,21 @@ TOOLCHAIN_DIR = /sdk/aarch64-linux-gnu-7.5.0-linaro
 SYSROOT_DIR = /sdk/usr
 SDL_DIR = /sdk/SDL2-2.26.1
 
+APP ?= SDL # or RAYLIB
+
 # Compiler Setup
 CXX = $(TOOLCHAIN_DIR)/bin/aarch64-linux-gnu-g++
-CXXFLAGS = -I$(SDL_DIR)/include -I$(SYSROOT_DIR)/include -I.
+ifeq ($(APP), SDL)
+    CXXFLAGS = -I$(SDL_DIR)/include -I$(SYSROOT_DIR)/include -I.
+	LIBS = -lSDL2 -lSDL2_ttf -lfreetype -lz -lbz2 -lGLESv2 -lEGL -lIMGegl -lsrv_um -lusc -lglslcompiler -lm
+	SRC = src/main_sdl.cpp
+else
+    CXXFLAGS = -I$(SYSROOT_DIR)/include -I.
+	LIBS = -lraylib -lSDL2 -lz -lbz2 -lGLESv2 -lEGL -lIMGegl -lsrv_um -lusc -lglslcompiler -lm
+	SRC = src/main_raylib.cpp
+endif
 LDFLAGS = -L$(SYSROOT_DIR)/lib -L$(SYSROOT_DIR)/lib/mali -Wl,-rpath-link=$(SYSROOT_DIR)/lib/mali
-LIBS = -lSDL2 -lSDL2_ttf -lfreetype -lz -lbz2 -lGLESv2 -lEGL -lIMGegl -lsrv_um -lusc -lglslcompiler -lm
 
-SRC = src/main.cpp
 
 all: $(OUT) copy_resources
 
